@@ -1,0 +1,149 @@
+/**
+ * Default theme for reveal.js.
+ *
+ * Copyright (C) 2011-2012 Hakim El Hattab, http://hakim.se
+ */
+
+
+// Default mixins and settings -----------------
+@import "../template/mixins";
+@import "../template/settings";
+// ---------------------------------------------
+
+
+
+// Include theme-specific fonts
+@font-face {
+  font-family: 'Roboto Slab';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Roboto Slab Regular'), local('RobotoSlab-Regular'), url(../../lib/font/RobotoSlab-Regular.woff) format('woff');
+}
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:400,700,400italic,700italic);
+
+// Override theme settings (see ../template/settings.scss)
+$backgroundColor: #111;
+
+$mainFont: 'Open Sans', sans-serif;
+$linkColor: #e7ad52;
+$linkColorHover: lighten( $linkColor, 20% );
+$headingFont: 'Roboto Slab', Impact, sans-serif;
+$headingTextShadow: none;
+$headingLetterSpacing: -0.03em;
+$headingTextTransform: none;
+$headingLineHeight: 1.2em;
+$selectionBackgroundColor: #e7ad52;
+$mainFontSize: 28px;
+
+
+// Theme template ------------------------------
+@import "../template/theme";
+// ---------------------------------------------
+
+// Custom stuff --------------------------------
+
+.modernizr body {
+    background-color: #FFF;
+    color: #222;
+}
+.modernizr h1,
+.modernizr h2,
+.modernizr h3,
+.modernizr p {
+    color: #222;
+}
+
+.reveal pre code {
+    font-size: 120%;
+    line-height: 1.4;
+    padding: 0.5em;
+    border-radius: 3px;
+}
+
+.reveal pre {
+    min-width: 40em;
+}
+
+.reveal .pause {
+    padding-top: 2em;
+}
+
+.reveal .dict-definition {
+    background: white;
+    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, FreeSerif, serif;
+    font-size: 0.8em;
+    color: #222;
+    text-align: left;
+    padding: 1em;
+    font-style: normal;
+}
+
+.reveal .dict-definition dt {
+    font-size: 1.4em;
+    display: inline;
+}
+
+.reveal .dict-definition dd {
+    line-height: 1.2;
+}
+
+.reveal .dict-definition-part {
+    display: block;
+    font-style: italic;
+    font-size: 90%;
+}
+
+
+.reveal section img.naked {
+    background: none;
+    border: none;
+    box-shadow: none;
+}
+
+
+.reveal .three-rows .row {
+    height: 30%;
+}
+
+.reveal .two-cols .col {
+    width: 35%;
+    padding: 0 5%;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+h3.col:first-child {
+    text-align: left;
+}
+
+.reveal .two-cols .col h3 {
+    text-align: left;
+}
+
+.reveal .alt {
+    color: $selectionBackgroundColor;
+}
+
+.reveal .alt2 {
+    color: #529FE7;
+}
+
+.face {
+    .col:first-child h2 {
+        -webkit-transform: rotate(15deg);
+        -webkit-transition: -webkit-transform 0.2s;
+    }
+    .col:nth-child(2) h2 {
+        -webkit-transform: rotate(-15deg);
+        -webkit-transition: -webkit-transform 0.2s;
+    }
+    &:after {
+        display: block;
+        content: '︵';
+        // width: 50%;
+        font-size: 500%;
+        margin: 0 auto;
+        // border-bottom: 3px solid #FFF;
+        // -webkit-transform: rotate(-10deg);
+    }
+}

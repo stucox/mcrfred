@@ -1,0 +1,763 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <title>Compatibility</title>
+
+    <meta name="description" content="Handling compatibility in modern web things">
+    <meta name="author" content="Stu Cox">
+
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <link rel="stylesheet" href="css/reveal.min.css">
+    <link rel="stylesheet" href="css/theme/stucox.css" id="theme">
+
+    <!-- For syntax highlighting -->
+    <link rel="stylesheet" href="lib/css/googlecode.css">
+
+    <!-- If the query includes 'print-pdf', use the PDF print sheet -->
+    <script>
+        document.write( '<link rel="stylesheet" href="css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );
+    </script>
+
+    <!--[if lt IE 9]>
+    <script src="lib/js/html5shiv.js"></script>
+    <![endif]-->
+</head>
+<body>
+
+<div class="reveal">
+<!-- Any section element inside of this container is displayed as a slide -->
+<div class="slides">
+
+<section>
+    <section>
+        <h1>Compatibility <span style="font-size:50%">via</span> Modernizr</h1>
+        <h3 class="alt2">Making web things fit their medium</h3>
+        <p>
+            <small>by <a href="http://www.stucox.com/">Stu Cox</a> / <a href="http://twitter.com/stucoxmedia">@stucoxmedia</a></small>
+        </p>
+        <p><small>#McrFRED | 27th June 2013 | Manchester, UK</small></p>
+        <aside class="notes">
+            <p>Progressive Enhancement, Responsive Design, Mobile-First</p>
+            <p>Strategies for making work with many browsers / devices / users</p>
+            <p>Feature detection is a tool within these strategies</p>
+            <p>Explain why we feature detect, give example techniques, then talk about Modernizr</p>
+            <p>Some of my own terminology thrown in</p>
+        </aside>
+    </section>
+
+    <section>
+        <blockquote cite="http://en.wiktionary.org/wiki/compatibility">
+            <dl class="dict-definition">
+                <dt>com•pat•i•bil•i•ty</dt> |kəmˌpatɪˈbɪlɪti| (abbr.: <strong>compat.</strong>)</span>
+                <span class="dict-definition-part">noun (pl. <strong>-i•ties</strong>)</span>
+                <dd>a state in which two things are able to exist or occur together without problems or conflict.</dd>
+            </dl>
+        </blockquote>
+        <div class="fragment pause">
+            <p>In this case:</p>
+            <h3>Your web thing ←→ Your user's browser/device</h3>
+        </div>
+    </section>
+</section>
+
+<section>
+    <section>
+        <h2>How we did it back in the day</h2>
+    </section>
+
+    <section class="two-cols three-rows">
+        <div class="row">
+            <h3 class="col">1. Make a <a href="http://adactio.com/journal/6246/">web thing</a></h3>
+            <div class="col">
+                <img src="img/example_wireframe_large.png" style="margin:0;" class="naked">
+            </div>
+        </div>
+        <div class="row">
+            <h3 class="col">2. Test it in Browser A</h3>
+            <div class="col">
+                <img src="img/Google_Chrome_icon_(2011).png" style="width:20%; margin:0;" class="naked">
+            </div>
+        </div>
+        <div class="row">
+            <h3 class="col">3. It works! Hurray!</h3>
+            <div class="col">
+                <img src="img/Tick.png" style="width:15%; margin:0;" class="naked">
+            </div>
+        </div>
+    </section>
+
+    <section class="two-cols three-rows">
+        <div class="row">
+            <h3 class="col">4. Test it in Browser B</h3>
+            <div class="col">
+                <img src="img/ie-logo.png" style="display:inline-block; width:20%; margin:0;" class="naked">
+            </div>
+        </div>
+        <div class="row pause">
+            <h3 class="col">5. Doesn't work :-(</h3>
+            <div class="col">
+                <img src="img/example_wireframe_large_bad.png" style="margin:0;" class="naked">
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>So we hack it.</h2>
+        <h4>CSS hacks:</h4>
+<pre style="width:50%"><code data-trim class="css">
+.btn {
+    *margin-left: -13px;
+}
+</code></pre>
+        <h4 class="pause">User-Agent sniffs:</h4>
+<pre style="width:50%"><code data-trim class="javascript">
+if (navigator.userAgent.match(/MSIE [67]\./)) {
+    // Fix for old IE
+}
+</code></pre>
+        <h3 class="fragment" style="margin-top:1em">These are essentially <span class="alt">heuristics</span>.</h3>
+    </section>
+
+    <section>
+        <h2>Heuristics imply assumptions.</h2>
+        <ul>
+            <li>"All browsers which parse CSS hack A also have layout bug B"</li>
+            <li>"All browsers which match user-agent C support feature D"</li>
+            <li>"I know about every browser my users might use"</li>
+            <li>"If my assumptions are true now, they'll also be true in the future"</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>"I know about every browser my users might use"</h2>
+        <ul>
+            <li><h3>85 browser versions with > 0.1% market share</h3></li>
+            <li><h3>7,000 different devices login to Facebook every day <sup>[1]</sup></h3></li>
+            <li><h3>Users have different needs (think accessibility)</h3></li>
+        </ul>
+        <p class="pause"></p>
+        <small>[1] <a href="http://techcrunch.com/2012/08/03/vp-mike-schroepfer-7000-different-mobile-devices-access-facebook-every-day/">techcrunch.com/2012/08/03/vp-mike-schroepfer-7000-different-mobile-devices-access-facebook-every-day/</a></small>
+    </section>
+</section>
+
+<section class="two-cols">
+    <section>
+        <div class="row">
+            <div class="col">
+                <h2>Browser A</h2>
+                <img src="img/Google_Chrome_icon_(2011).png" class="naked" style="width: 20%">
+            </div>
+            <div class="col">
+                <h2>Browser B</h2>
+                <img src="img/ie-logo.png" class="naked" style="width: 20%">
+            </div>
+        </div>
+        <p>Three sources of compatibility problems:</p>
+        <ul class="fragment" style="list-style: none">
+            <li><h3 class="alt">Features</h3></li>
+            <li><h3 class="alt">Plugins</h3></li>
+            <li><h3 class="alt">Bugs</h3></li>
+        </ul>
+        <!-- used for styling change -->
+        <div class="fragment" id="face"></div>
+    </section>
+
+    <section>
+        <h2>Features</h2>
+        <ul style="list-style: none">
+            <li>
+                <h3 class="alt">CSS:</h3>
+                <p><code>@font-face</code>, transitions, animations, flexbox, ...</p>
+            </li>
+            <li>
+                <h3 class="alt">HTML:</h3>
+                <p><code>&lt;audio&gt;</code>, <code>&lt;video&gt;</code>, input types, drag &amp; drop, ...</p>
+            </li>
+            <li>
+                <h3 class="alt">JavaScript:</h3>
+                <p>History API, IndexedDB, WebSockets, ...</p>
+            </li>
+            <li>
+                <h3 class="alt">...</h3>
+            </li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Plugins</h2>
+        <ul style="list-style: none">
+            <li>
+                <h3 class="alt">Platforms/Runtimes:</h3>
+                <p>Flash, Silverlight, Java, ...</p>
+            </li>
+            <li>
+                <h3 class="alt">Viewers:</h3>
+                <p>PDF, Office documents, ...</p>
+            </li>
+            <li>
+                <h3 class="alt">...</h3>
+            </li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Bugs</h2>
+        <ul style="list-style: none">
+            <li>
+                <h3 class="alt">Rendering:</h3>
+                <p>Box model, double margin, ...</p>
+            </li>
+            <li>
+                <h3 class="alt">Other broken things:</h3>
+                <p>History API in Android 2.x, ...</p>
+            </li>
+            <li>
+                <h3 class="alt">...</h3>
+            </li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>These can all be described under one term:</h2>
+        <h1 class="fragment alt">CAPABILITIES</h1>
+    </section>
+
+    <section>
+        <ul>
+            <li>
+                <h3><span class="alt">Features</span> are capabilities</h3>
+                <p>"Browser X has the ability to render SVG"</p>
+            </li>
+            <li>
+                <h3><span class="alt">Plugins</span> <em>add</em> capabilities</h3>
+                <p>"A browser with the Flash plugin has the ability to render Flash media"</p>
+            </li>
+            <li>
+                <h3><span class="alt">Bugs</span> are incapabilities</h3>
+                <p>"Browser Y has the ability <em>NOT</em> to fuck up the box model"</p>
+            </li>
+        </ul>
+        <div class="pause"></div>
+        <blockquote class="fragment"><h3 class="alt">“The differences between 2 users' browsers can be described (entirely) by the differences between their capability sets.”</h3></blockquote>
+        <aside class="notes">
+            <p>Old adage: "it's not a bug, it's a feature"</p>
+            <p>The feature we want is bug not to be there!</p>
+        </aside>
+    </section>
+</section>
+
+<section>
+    <section>
+        <h2>Progressive Enhancement</h2>
+        <p class="pause">It was going to get mentioned sooner or later.</p>
+        <h3 class="alt pause fragment">Providing different experiences for different users, depending on their capabilities.</h3>
+        <aside class="notes">
+            <p>Not about making it work without JS… it's broader</p>
+        </aside>
+    </section>
+
+    <section>
+        <h2>Think of your web thing as a collection of features.</h2>
+        <div class="fragment">
+            <ul class="pause">
+                <li><h3><span class="alt">Core:</span> the essential bits <u>every</u> user needs</h3></li>
+                <li><h3><span class="alt">Enhancements:</span> non-essential additions</h3></li>
+            </ul>
+            <p class="pause">The core is smaller than you think.</p>
+        </div>
+        <aside class="notes">
+            <p>Core: every user, any browser, any device</p>
+        </aside>
+    </section>
+
+    <section>
+        <h2>Each feature depends on capabilities of the browser.</h2>
+        <ul class="pause">
+            <li>
+                <h3><span class="alt">Core capabilities</span> → "system requirements" for your web thing</h3>
+                <p>Fewer core capabilities = accessible to more users.</p>
+            </li>
+            <li>
+                <h3><span class="alt">Enhancement capabilities</span> → tiers of experience</h3>
+                <p>If a user has the required capabilities, they get the enhancement; otherwise they don't.</p>
+            </li>
+        </ul>
+        <aside class="notes">
+            <p>If you decide it needs JavaScript too – fine.</p>
+        </aside>
+    </section>
+
+    <section>
+        <h2 class="alt">What's an enhancement?</h2>
+        <h3>Examples:</h3>
+        <ul>
+            <li>Some styling</li>
+            <li>Fonts</li>
+            <li>Animations</li>
+            <li>Audio / video content</li>
+            <li>A background image</li>
+            <li>A whole functional part – e.g. a chat feature</li>
+        </ul>
+    </section>
+
+</section>
+
+<section>
+    <section>
+        <h2 class="alt">Atomic Enhancements</h2>
+        <ul>
+            <li>Either applied fully, or not at all</li>
+            <li>No side effects when required capabilities aren't present</li>
+            <li><em>Degrades gracefully</em></li>
+        </ul>
+        <div class="pause fragment">
+            <h3>If enhancements aren't <strong class="alt">atomic</strong>, bad things happen.</h3>
+            <ul>
+                <li>Broken layouts</li>
+                <li>Javascript errors</li>
+                <li>Unusable interfaces</li>
+            </ul>
+        </div>
+    </section>
+
+    <section>
+        <h3>Examples:</h3>
+<pre style="width: 50%"><code class="css" data-trim>
+.module {
+    box-sizing: border-box;
+    padding: 1em;
+    width: 20em;
+}
+</code></pre>
+        <p><em>If <code>box-sizing</code> not supported, layout won't be as expected.</em></p>
+        <div class="fragment pause">
+<pre style="width: 50%"><code class="javascript" data-trim>
+// My module
+var modules = document.querySelectorAll('.module');
+...
+</code></pre>
+            <p><em>TypeError: Object #&lt;HTMLDocument&gt; has no method 'querySelectorAll'</em></p>
+        </div>
+    </section>
+
+    <section>
+        <h2>How can we ensure enhancements are atomic?</h2>
+        <ol>
+            <li><h3>Avoid certain dependencies</h3></li>
+            <li><h3>Safety net</h3></li>
+            <li><h3 class="alt">Feature detect</h3></li>
+        </ol>
+    </section>
+</section>
+
+<section>
+    <section>
+        <h2 class="alt">Feature detection</h2>
+        <h3>Testing if the browser offers certain capabilities</h3>
+    </section>
+
+    <section>
+        <h2>Basic pattern</h2>
+<pre style="width: 50%"><code class="javascript" data-trim>
+if (supportsFeature) {
+    // Use feature!
+    // Ensure all code depending on this feature is
+    // contained here... no side effects!
+}
+else {
+    // Some fallback (optional)
+}
+</code></pre>
+        <aside class="notes">
+            <p>Provide examples of fallbacks later</p>
+        </aside>
+    </section>
+
+    <section>
+        <h2>Techniques</h2>
+        <ol>
+            <li><h3 class="alt">Does it exist?</h3>
+<pre><code class="javascript" data-trim>
+'geolocation' in navigator
+</code></pre>
+            </li>
+            <li><h3 class="alt">Does it stick?</h3>
+<pre><code class="javascript" data-trim>
+var el = createElement('div');
+el.style.cssText = 'filter:blur(2px)';
+!!el.style.length   // true if CSS filters supported
+</code></pre>
+            </li>
+            <li><h3 class="alt">Does it work?</h3>
+<pre><code class="javascript" data-trim>
+var image = new Image();
+image.onload = function() {
+  image.width == 1  // true if WebP supported
+}
+image.src = 'data:image/webp;base64,UklGRiwAAABXRUJQVlA4I...';
+</code></pre>
+            </li>
+    </section>
+
+    <section>
+        <h2>Media Queries</h2>
+        <p>Yep, they're a kind of feature detection too.</p>
+        <h4 class="alt">In CSS:</h3>
+<pre style="width: 50%"><code class="javascript" data-trim>
+@media (min-width: 800px) {
+    // Has a large viewport
+}
+
+@media not (min-width: 800px) {
+    // Doesn't have a large viewport
+}
+</code></pre>
+        <h4 class="alt">In JS:</h3>
+<pre style="width: 50%"><code class="javascript" data-trim>
+if (window.matchMedia('(min-width: 800px)').matches) {
+    // Has a large viewport
+}
+else {
+    // Doesn't have a large viewport
+}
+</code></pre>
+        <aside class="notes">
+            <p>Ironically need to feature detect for this</p>
+        </aside>
+    </section>
+
+    <section>
+        <h2>Native Detection</h2>
+        <p>Via <code>@supports</code></p>
+        <h4 class="alt">In CSS:</h3>
+<pre style="width: 50%"><code class="css" data-trim>
+@supports (display: flex) {
+    // Supports flexbox
+}
+
+@supports not (display: flex) {
+    // Doesn't support flexbox
+}
+</code></pre>
+        <h4 class="alt">In JS:</h3>
+<pre style="width: 50%"><code class="javascript" data-trim>
+if (window.CSS.supports('display', 'flex') {
+    // Supports flexbox
+}
+else {
+    // Doesn't support flexbox
+}
+</code></pre>
+    </section>
+
+    <section>
+        <h2>Fallbacks</h2>
+        <ul>
+            <li>
+                <h3 style="margin:1em 0 0">No fallback: <span class="alt">"feature gating"</span></h3>
+                <p>Efficient, easy to maintain.</p>
+            </li>
+            <li>
+                <h3 style="margin:1em 0 0">Replace functionality: <span class="alt">"polyfilling"</span></h3>
+                <p>Can be network and processor intensive, rarely an exact match</p>
+            </li>
+            <li>
+                <h3 style="margin:1em 0 0">Alternative functionality: <span class="alt">"sandwich filling"</span></h3>
+                <p>Usually unnecessary…</p>
+            </li>
+        </ul>
+        <aside class="notes">
+            <p>Feature gate: e.g. web fonts – no need for images, just show standard fonts; or chat feature</p>
+            <p>Polyfilling: e.g. using Flash to enable video, or polling instead of websockets</p>
+            <p>Sandwich filling: e.g. </p>
+        </aside>
+    </section>
+
+</section>
+
+<section>
+    <section data-state="modernizr">
+        <h2><img src="img/Modernizr-2-Logo.png" alt="Modernizr" style="width:50%" class="naked"></h2>
+        <p><a href="http://modernizr.com">http://modernizr.com</a></p>
+        <h3>It's a feature detection library.</h3>
+        <p>Detects for 174+ modern browser capabilities.</p>
+        <aside class="notes">
+            <p>174 as master branch right now</p>
+        </aside>
+    </section>
+
+    <section>
+        <h2>Basic patterns</h2>
+        <p>It makes feature detection a breeze</p>
+<pre style="width: 50%"><code class="javascript" data-trim>
+if (Modernizr.geolocation) {
+    // Use feature!
+    // Ensure all code depending on this feature is
+    // contained here... no side effects!
+}
+else {
+    // Some fallback (optional)
+}
+</code></pre>
+<pre style="width: 50%" class="pause"><code class="javascript" data-trim>
+.geolocation .module {
+    /* Styles if geolocation supported */
+}
+.no-geolocation .module {
+    /* Styles if geolocation not supported */
+}
+</code></pre>
+    </section>
+
+    <section>
+        <h2>Custom builds</h2>
+        <p>All killer, no filler</p>
+        <a href="http://modernizr.com/download"><img src="img/builder.jpg"></a>
+    </section>
+
+    <section>
+        <h2>Roll your own</h2>
+        <p>Via <code>Modernizr.addTest()</code></p>
+<pre style="width: 50%"><code class="javascript" data-trim>
+Modernizr.addTest('yoda', function () {
+    var yoda = document.createElement('yoda');
+    return 'theforce' in yoda;
+});
+</code></pre>
+    </section>
+
+    <section>
+        <h2>Conditional Loading</h2>
+        <p>Via <code>Modernizr.load()</code></p>
+        <p>Avoid heavy loading for browsers which can't use it</p>
+<pre style="width: 50%"><code class="javascript" data-trim>
+Modernizr.load({
+    test: Modernizr.geolocation,
+    yep: 'geo.js',
+    nope: 'geo-polyfill.js'
+});
+</code></pre>
+        <p>Rarely need <code>nope</code> – big polyfills are a bad idea!</p>
+    </section>
+
+    <section>
+        <h2 class="alt2">Modernizr v3.0</h2>
+        <div class="fragment">
+            <ul>
+                <li>New AMD-based internal architecture</li>
+                <li>Builds are waaaaay smaller</li>
+                <li>20+ more detects since 2.6.2</li>
+                <li>Better handling of async tests</li>
+                <li>Uses <code>@supports</code> under the hood</li>
+                <li>Faster release cycle</li>
+                <li>Better documentation</li>
+                <li>Easier integration with <a href="https://github.com/doctyper/grunt-modernizr">grunt-modernizr</a></li>
+            </ul>
+            <p class="pause">Coming soon, we promise!</p>
+            <p class="pause">See: <a href="http://alexsexton.com/talks/modernizr-3-workflow/">Alex Sexton's Modernizr 3 Workflow</a></p>
+        </div>
+    </section>
+
+</section>
+
+<section>
+    <p>Now I'm going to talk a bit about my involvement in Modernizr.</p>
+</section>
+
+<section>
+    <section>
+        <h2 class="alt">Undetectables</h2>
+        <p>Unfortunately some things fall under our radar</p>
+    </section>
+
+    <section>
+        <h2>A good feature detect...</h2>
+        <ul class="pause">
+            <li><h3>Gives accurate <span class="alt">positives</span></h3></li>
+            <li><h3>Gives accurate <span class="alt">negatives</span></h3></li>
+            <li><h3>Is <span class="alt">lightweight</span> (fast &amp; small)</h3></li>
+            <li><h3>Doesn't make assumptions or use heuristics</h3></li>
+        </ul>
+        <p class="pause">Realistically, most detects make some assumptions – we try to minimise these</p>
+    </section>
+
+    <section>
+        <h2><span class="alt">Rule 1:</span> It must interact with the document</h2>
+        <p>Because that's all we can access from JS.</p>
+        <ul>
+            <li>
+                <h3 class="alt">Styling</h3>
+                <p>Can't access the pixels on the screen</p>
+                <p>Best-guess based on the (re)actions of the DOM</p>
+            </li>
+            <li>
+                <h3 class="alt">Form UIs</h3>
+                <p>Appear on top of the document – invisible to us</p>
+            </li>
+        </ul>
+    </section>
+
+    <section>
+        <h2><span class="alt">Rule 2:</span> It shouldn't take any user interaction</h2>
+        <ul>
+            <li>
+                <h3 class="alt">Events</h3>
+                <p>Can't tell if events (e.g. <code>DOMContentLoaded</code>) will be fired at the correct time</p>
+            </li>
+            <li>
+                <h3 class="alt"><code>contenteditable</code></h3>
+            </li>
+        </ul>
+        <p class="pause">We can often give accurate <em>negatives</em>, but not positives</p>
+    </section>
+
+    <section>
+        <h2><span class="alt">Rule 3:</span> Think about older browsers/devices</h2>
+        <ul>
+            <li>
+                <h3 class="alt">Using new APIs</h3>
+                <p>e.g. <code>window.performance</code> – tells us nothing about older devices</p>
+            </li>
+            <li>
+                <h3 class="alt">Touchscreens</h3>
+                <p>Don't get me started...</p>
+            </li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>You can't detect a touchscreen</h2>
+        <p>Not reliably, anyway</p>
+        <h3 class="pause"><a href="http://stucox.com/blog/you-cant-detect-a-touchscreen/">http://stucox.com/blog/you-cant-detect-a-touchscreen/</a></h3>
+        <p>All techniques either use heuristics or rely on new APIs.</p>
+    </section>
+
+    <section>
+        <h2>In fact, you can't detect many device features</h2>
+        <p>Not reliably, anyway</p>
+        <h3 class="pause">Think about the <u>assumptions</u> you're making</h3>
+    </section>
+</section>
+
+<section>
+    <p>Now I'm going to talk a bit about some hand-wavey idealistic stuff.</p>
+</section>
+
+<section>
+    <section>
+        <h2 class="alt">Managing compatibility</h2>
+        <h3 class="pause">Variation between platforms <em>is</em> the web: embrace it.</h3>
+        <p>Consider it from the start of your project.</p>
+    </section>
+
+    <section>
+        <h2><span class="alt">Idea:</span> modular capability dependencies</h2>
+        <p class="pause">RequireJS-like syntax for defining browser dependencies</p>
+<pre style="width: 50%"><code class="javascript" data-trim>
+browserRequire(['svg', 'canvas'], function () {
+
+   // Only runs if capabilities available
+
+});
+</code></pre>
+    </section>
+
+    <section>
+        <h2><span class="alt">Even better:</span> a RequireJS plugin</h2>
+<pre style="width: 50%" class="pause"><code class="javascript" data-trim>
+require(['jquery', 'M!svg', 'M!canvas'], function ($) {
+
+   // Only runs if software AND capability dependencies
+   // satisfied
+
+});
+</code></pre>
+    </section>
+</section>
+
+<section>
+    <p>That's all I've got.</p>
+    <p class="pause"><a href="http://www.stucox.com/">www.stucox.com</a> / <a href="http://twitter.com/stucoxmedia">@stucoxmedia</a></p>
+</section>
+
+
+</div><!-- /slides -->
+</div><!-- /reveal -->
+
+<script src="lib/js/head.min.js"></script>
+<script src="js/reveal.min.js"></script>
+
+<script src="components/underscore/underscore-min.js"></script>
+
+<script>
+
+    // Full list of configuration options available here:
+    // https://github.com/hakimel/reveal.js#configuration
+    Reveal.initialize({
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+
+        height: '100%',
+        width: '100%',
+
+        // theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+        transition: Reveal.getQueryHash().transition || 'linear', // default/cube/page/concave/zoom/linear/fade/none
+
+        // Optional libraries used to extend on reveal.js
+        dependencies: [
+            { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+            { src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+            { src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+            { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+            { src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+            { src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+            // { src: 'plugin/search/search.js', async: true, condition: function() { return !!document.body.classList; } }
+            // { src: 'plugin/remotes/remotes.js', async: true, condition: function() { return !!document.body.classList; } }
+        ]
+    });
+
+</script>
+
+<script>
+// (function () {
+//     var target = document.querySelector('#three-sources');
+//     var config = {
+//         attributes: true
+//     };
+//     var observer = new MutationObserver(function(mutations) {
+//         mutations.forEach(function(mutation) {
+//             if (_.contains(mutation.target.className.split(' '), 'visible')) {
+
+//             }
+//         });
+//     });
+//     observer.observe(target, config);
+// }());
+</script>
+
+<script>
+(function () {
+    var trigger = document.querySelector('#face');
+    Reveal.addEventListener('fragmentshown', function(event) {
+        if (trigger == event.fragment) {
+            trigger.parentElement.classList.add('face');
+        }
+    });
+    Reveal.addEventListener('fragmenthidden', function(event) {
+        if (trigger == event.fragment) {
+            trigger.parentElement.classList.remove('face');
+        }
+    });
+}());
+</script>
+
+</body>
+</html>
